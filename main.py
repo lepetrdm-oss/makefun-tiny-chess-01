@@ -1,26 +1,24 @@
-import os,sys,json,urllib.request as u
-S="OOOO~~~~YYcmTTYhOOOcTJEOTYY;OOOO!'11';OO1OY^1T^c1O^c1TY^';OT!'11;EEEEOOOEOTYETTYEOYYEYYYETOO;EEEOOOOTYYYJOOOJOOOJOOOJOOOJOOOOOOTcmYOccOOE;;;;11'1''!1''!1''!1''!"
-M={'P':100,'N':320,'B':330,'R':500,'Q':900,'K':0}
+import os,json,urllib.request as u
+S="OOOOTYY;TJEOOOOcTTYhYYcm~~~~OOOO!'11';OT1TY^1O^c1T^c1OY^';OO!'11;EEEETOOEYYYEOYYETTYEOTYEOOO;EEEOOOTJOOOJOOOJOOOJOOOJOOOTYYYOOOO;EEJEOTOETTTOOTTJOTTEOTTEOOO;EEJcmYOccOOE;;;;11'1''!1''!1''!1''!"
+M=dict(zip('PNBRQK.',[100,320,330,500,900,0,0]))
 N=(-21,-19,-12,-8,8,12,19,21)
 G=(-11,-10,-9,-1,1,9,10,11)
-V={p:[M[p]+ord(S[o+(9-i//10)*4+min(i%10-1,8-i%10)])-79 if 20<i<99 and 0<i%10<9 else 0 for i in range(120)] for p,o in zip('PNBRK',(0,32,64,96,128))}
-V['Q']=[900]*120
+V={p:[M[p]+ord(S[o+(9-i//10)*4+min(i%10-1,8-i%10)])-79 if 20<i<99 else 0 for i in range(120)] for p,o in zip('PNBRQK',range(0,192,32))}
 Z={95:12,98:14,91:13,25:3,28:11,21:7}
-TT={};ND=0;BD=8e4;MA=1e5
+TT={};H={};ND=0;BD=6e4;MA=1e5
 X=Exception
 def att(b,s,w):
- u='PNBRQK' if w else 'pnbrqk';d=1 if w else -1
+ u='PNBRQK'if w else'pnbrqk';d=1 if w else-1
  for x in N:
   if b[s+x]==u[1]:return 1
  for x in G:
   if b[s+x]==u[5] or b[s+x]==u[0] and x*d in (9,11):return 1
- for x in G:
   j=s+x
   while b[j]=='.':j+=x
-  if b[j] in (u[2]+u[4] if abs(x) in (9,11) else u[3]+u[4]):return 1
+  if b[j] in u[3-(abs(x) in(9,11))]+u[4]:return 1
  return 0
 def gen(b,c,e,w):
- d=-10 if w else 10;my='PNBRQK' if w else 'pnbrqk';fo=my.swapcase()
+ d=-10 if w else 10;my='PNBRQK'if w else'pnbrqk';fo=my.swapcase()
  for i,p in enumerate(b):
   if p in my:
    u=p.upper()
@@ -33,7 +31,7 @@ def gen(b,c,e,w):
       else:
        yield i,j,''
        if x==d and i//10 in (8,3) and b[i+2*d]=='.':yield i,i+2*d,''
-   elif u=='N' or u=='K':
+   elif u in'NK':
     for x in N if u=='N' else G:
      j=i+x;q=b[j]
      if q=='.' or q in fo:yield i,j,''
@@ -45,62 +43,59 @@ def gen(b,c,e,w):
       if b[j] in fo:break
       j+=x
  if c:
-  k,a,y=(95,1,2) if w else (25,4,8)
+  k,a,y=(95,1,2)if w else(25,4,8)
   if not att(b,k,not w):
-   if c&a and b[k+1:k+3]=='..' and b[k+3]==my[3] and not att(b,k+1,not w) and not att(b,k+2,not w):yield k,k+2,''
-   if c&y and b[k-3:k]=='...' and b[k-4]==my[3] and not att(b,k-1,not w) and not att(b,k-2,not w):yield k,k-2,''
+   if c&a and b[k+1:k+3]=='..' and not att(b,k+1,not w) and not att(b,k+2,not w):yield k,k+2,''
+   if c&y and b[k-3:k]=='...' and not att(b,k-1,not w) and not att(b,k-2,not w):yield k,k-2,''
 def do(b,m,c,e):
  i,j,q=m;p=b[i];l=list(b);l[i]='.';U=p.upper()
  if U=='P' and j==e:l[i-i%10+j%10]='.'
  if U=='K' and abs(j-i)==2:l[j+1 if j>i else j-2]='.';l[j-1 if j>i else j+1]='R' if p=='K' else 'r'
- l[j]=(q.lower() if p=='p' else q) or p
+ l[j]=(q.lower()if p=='p' else q)or p
  return ''.join(l),c&Z.get(i,15)&Z.get(j,15),(i+j)//2 if U=='P' and abs(i-j)==20 else -1
 def ok(b,c,e,m,w):
  b2,_,_=do(b,m,c,e)
- return not att(b2,b2.index('K' if w else 'k'),not w)
+ return not att(b2,b2.index('Kk'[not w]),not w)
 def sr(b,c,e,w,d,a,be,pl):
  global ND
  ND+=1
  if ND>BD:raise X
- K=lambda m:M[b[m[0]].upper()]-10*M.get(b[m[1]].upper(),0)
- tm=None
- if d>0:
-  t=TT.get((b,c,e,w))
-  if t and t[0]>=d:return t[1]
-  tm=t and t[2]
- if d<=0 and not att(b,b.index('K' if w else 'k'),not w):
-  s=sum(V[p][i] if p.isupper() else -V[p.upper()][119-i] for i,p in enumerate(b) if p.isalpha())
-  if not w:s=-s
-  if s>=be:return be
-  if s>a:a=s
-  ms=[m for m in gen(b,c,e,w) if (b[m[1]]!='.' or m[1]==e or m[2]) and ok(b,c,e,m,w)]
-  bv=a
+ ck=att(b,b.index('Kk'[not w]),not w)
+ k=(b,c,e,w);t=TT.get(k)if d>0 else 0
+ if t and t[0]>=d:return t[1]
+ tm=t and t[2]
+ if d<=0 and not ck:
+  ev=sum(V[p][i] if p.isupper() else -V[p.upper()][119-i] for i,p in enumerate(b) if p.isalpha())
+  if not w:ev=-ev
+  if ev>=be:return be
+  if ev>a:a=ev
+  ms=[m for m in gen(b,c,e,w) if (b[m[1]]!='.' or m[1]==e or m[2]) and ok(b,c,e,m,w) and (m[1]==e or m[2] or ev+M[b[m[1]].upper()]+200>=a)]
  else:
   ms=[m for m in gen(b,c,e,w) if ok(b,c,e,m,w)]
-  if not ms:return -MA+pl if att(b,b.index('K' if w else 'k'),not w) else 0
-  a0=a;bv=-MA;bm=ms[0]
- ms.sort(key=lambda m:-9e9 if m==tm else K(m))
- for m in ms:
+  if not ms:return -MA+pl if ck else 0
+  a0=a;bm=ms[0]
+ ms.sort(key=lambda m:-1e9 if m==tm else -1e6-10*M[b[m[1]].upper()] if b[m[1]]!='.' or m[1]==e else -H.get(m,0))
+ for n,m in enumerate(ms):
   b2,c2,e2=do(b,m,c,e)
-  s=-sr(b2,c2,e2,not w,d-1,-be,-a,pl+1)
-  if s>bv:bv=s;bm=m
-  if s>a:a=s
-  if a>=be:break
- if d>0 and abs(bv)<90000 and a0<bv<be:TT[(b,c,e,w)]=(d,bv,bm)
- return bv
+  s=-sr(b2,c2,e2,not w,d-1,-a-1 if d>0 and n else -be,-a,pl+1)
+  if d>0 and n and s>a:s=-sr(b2,c2,e2,not w,d-1,-be,-a,pl+1)
+  if s>a:a=s;bm=m
+  if a>=be:H[m]=H.get(m,0)+d*d;break
+ if d>0 and abs(a)<9e4:TT[k]=(d if a0<a<be else -d,a,bm)
+ return a
 def pf(f):
  p=f.split()
  b=' '*20+''.join(' '+''.join(c if c>'9' else '.'*int(c) for c in r)+' ' for r in p[0].split('/'))+' '*20
  c=sum(1<<'KQkq'.index(x) for x in p[2] if x!='-')
- e=-1 if p[3]=='-' else (10-int(p[3][1]))*10+ord(p[3][0])-96
+ e=-1 if p[3]=='-'else(10-int(p[3][1]))*10+ord(p[3][0])-96
  return b,c,e,p[1]=='w'
-U=os.environ['MAKEFUN_ENV_URL']
+U=os.getenv('MAKEFUN_ENV_URL')
 def post(p,o):
- for _ in range(2):
+ for _ in'12':
   try:return json.load(u.urlopen(U+p,json.dumps(o).encode(),timeout=4))
   except:pass
  raise X
-f=lambda x:'abcdefgh'[x%10-1]+str(10-x//10)
+f=lambda x:chr(96+x%10)+str(10-x//10)
 while 1:
  g=post('/game',{})
  if g['status']=='done':break
@@ -114,8 +109,8 @@ while 1:
     b2,c2,e2=do(b,m,c,e)
     s=-sr(b2,c2,e2,not w,d-1,-MA,-a,1)
     if s>a:a=s;bm=m
+   lg.sort(key=lambda m:m!=bm)
    d+=1
   except X:break
  mv=f(bm[0])+f(bm[1])+bm[2].lower()
  post('/move',{'game':g['game'],'move':mv})
- print(g['game'],mv,file=sys.stderr)

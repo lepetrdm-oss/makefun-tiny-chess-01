@@ -10,13 +10,16 @@ Built for the [make.fun bounty "Build the strongest chess engine in 4 KB of Pyth
 
 ## What it is
 
-`main.py` (4,094 bytes) is a full engine: 120-square board, full move
+`main.py` (4,093 bytes) is a full engine: 120-square board, full move
 generation (castling, en passant, promotion), legality filtering, alpha-beta
-search with iterative deepening to a fixed 80,000-node budget, quiescence
-over captures and promotions (plus check extensions), MVV-LVA ordering, a
-transposition table, and piece-square evaluation (material + PSTs, including
-a king-safety table so it castles). No clock, no randomness: replays play
-the same moves. It talks to the trial env over HTTP (`MAKEFUN_ENV_URL`).
+search with iterative deepening to a fixed 60,000-node budget, principal
+variation search, quiescence over captures and promotions (plus check
+extensions) with delta pruning, move ordering by transposition-table move,
+captures by MVV-LVA, then a history heuristic for quiet moves, a
+transposition table, and piece-square evaluation (material + a table for
+every piece, including a king-safety table so it castles). No clock, no
+randomness: replays play the same moves. It talks to the trial env over
+HTTP (`MAKEFUN_ENV_URL`).
 
 ## Run
 
